@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-sqlOnDemand--uatpoc",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/3cdbe24a-2a58-4a61-97ff-395cd3ff4d73/resourceGroups/SSIS/providers/Microsoft.Synapse/workspaces/uatpoc",
+		"groupId": "sqlOnDemand",
+		"fqdns": [
+			"uatpoc-ondemand.6e5efb0b-bbe8-4127-930c-239f8c38d9ba.sql.azuresynapse.net"
+		]
+	}
+}

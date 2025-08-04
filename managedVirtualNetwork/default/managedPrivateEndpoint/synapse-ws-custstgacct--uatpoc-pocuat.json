@@ -1,0 +1,7 @@
+{
+	"name": "synapse-ws-custstgacct--uatpoc-pocuat",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/3cdbe24a-2a58-4a61-97ff-395cd3ff4d73/resourceGroups/SSIS/providers/Microsoft.Storage/storageAccounts/pocuat",
+		"groupId": "dfs"
+	}
+}

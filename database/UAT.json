@@ -1,0 +1,25 @@
+{
+	"name": "UAT",
+	"properties": {
+		"Name": "UAT",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://finaldeltafiletoparquetfile@uatpocstorage.dfs.core.windows.net/",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "FinalAzureDeltaFileToParquetFile"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 2,
+		"ObjectId": "d362fe39-8801-4d5e-8912-48b65443f6cf"
+	},
+	"type": "DATABASE"
+}

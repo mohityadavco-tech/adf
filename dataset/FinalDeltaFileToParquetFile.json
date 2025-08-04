@@ -1,0 +1,20 @@
+{
+	"name": "FinalDeltaFileToParquetFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "FinalAzureDeltaFileToParquetFile",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "finaldeltafiletoparquetfile"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

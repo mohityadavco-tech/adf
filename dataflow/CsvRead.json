@@ -1,0 +1,155 @@
+{
+	"name": "CsvRead",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "csvfilesource",
+						"type": "DatasetReference"
+					},
+					"name": "CSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlServer",
+						"type": "DatasetReference"
+					},
+					"name": "SQL"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlServer",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlServer",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ExistsIntoSql"
+				},
+				{
+					"name": "InsertDate"
+				},
+				{
+					"name": "UpdateDate"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "alterRow2"
+				},
+				{
+					"name": "exists1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ProductId as string,",
+				"          ProductName as string,",
+				"          Price as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CSV",
+				"source(output(",
+				"          Id as long,",
+				"          ProductId as string,",
+				"          ProductName as string,",
+				"          Price as string,",
+				"          HashKey as string,",
+				"          InsertedDate as timestamp,",
+				"          UpdatedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SQL",
+				"SQL, CSV exists(SQL@ProductId==Source@ProductId,",
+				"     negate:false,",
+				"     broadcast: 'both')~> ExistsIntoSql",
+				"exists1 derive(InsertDate = currentUTC()) ~> InsertDate",
+				"ExistsIntoSql derive(UpdateDate = currentUTC()) ~> UpdateDate",
+				"UpdateDate alterRow(updateIf(true())) ~> alterRow1",
+				"InsertDate alterRow(insertIf(true())) ~> alterRow2",
+				"select1, SQL exists(select1@ProductId == SQL@ProductId,",
+				"     negate:true,",
+				"     broadcast: 'both')~> exists1",
+				"CSV select(mapColumn(",
+				"          ProductId,",
+				"          ProductName,",
+				"          Price",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"alterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Id as long,",
+				"          ProductId as string,",
+				"          ProductName as string,",
+				"          Price as double,",
+				"          HashKey as string,",
+				"          InsertedDate as timestamp,",
+				"          UpdatedDate as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          ProductId,",
+				"          ProductName,",
+				"          Price,",
+				"          InsertedDate = InsertDate",
+				"     )) ~> sink1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Id as long,",
+				"          ProductId as string,",
+				"          ProductName as string,",
+				"          Price as double,",
+				"          HashKey as string,",
+				"          InsertedDate as timestamp,",
+				"          UpdatedDate as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['ProductId'],",
+				"     skipKeyWrites:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          ProductId,",
+				"          ProductName,",
+				"          Price,",
+				"          UpdatedDate",
+				"     )) ~> sink2"
+			]
+		}
+	}
+}

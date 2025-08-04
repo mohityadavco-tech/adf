@@ -1,0 +1,18 @@
+{
+	"name": "DeleteParquetFileToDeltaFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataParquetFileToDeltaFile",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "parquetfiletodeltafile"
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

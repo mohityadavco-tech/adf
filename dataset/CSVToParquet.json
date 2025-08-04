@@ -1,0 +1,42 @@
+{
+	"name": "CSVToParquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ParquetFileSource",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"FileName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().FileName",
+					"type": "Expression"
+				},
+				"fileSystem": "csvtoparquet"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "ProductId",
+				"type": "UTF8"
+			},
+			{
+				"name": "ProductName",
+				"type": "UTF8"
+			},
+			{
+				"name": "Price",
+				"type": "DOUBLE"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
