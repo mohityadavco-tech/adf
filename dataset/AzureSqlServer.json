@@ -23,8 +23,7 @@
 			},
 			{
 				"name": "Price",
-				"type": "float",
-				"precision": 15
+				"type": "varchar"
 			},
 			{
 				"name": "HashKey",
