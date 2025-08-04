@@ -1,0 +1,63 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "uatpoc"
+		},
+		"AzureBlobcsvfilearchive_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase_password": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_password": {
+			"value": ""
+		},
+		"CSVFileSourceBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"FinalAzureDeltaFileToParquetFile_accountKey": {
+			"value": ""
+		},
+		"ParquetFileSource_accountKey": {
+			"value": ""
+		},
+		"uatpoc-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:uatpoc.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AzureDataParquetFileToDeltaFile_properties_typeProperties_url": {
+			"value": "https://uatpocstorage.dfs.core.windows.net/"
+		},
+		"AzureParquetFileToDaltaFile_properties_typeProperties_url": {
+			"value": "https://uatpocstorage.dfs.core.windows.net/"
+		},
+		"AzureSqlDatabase_properties_typeProperties_server": {
+			"value": "devdbpoc.database.windows.net"
+		},
+		"AzureSqlDatabase_properties_typeProperties_database": {
+			"value": "UATPOC"
+		},
+		"AzureSqlDatabase_properties_typeProperties_userName": {
+			"value": "sqladmin"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "devdbpoc.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "UATPOC"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "sqladmin"
+		},
+		"FinalAzureDeltaFileToParquetFile_properties_typeProperties_url": {
+			"value": "https://uatpocstorage.dfs.core.windows.net/"
+		},
+		"ParquetFileSource_properties_typeProperties_url": {
+			"value": "https://uatpocstorage.dfs.core.windows.net/"
+		},
+		"uatpoc-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://pocuat.dfs.core.windows.net"
+		}
+	}
+}
