@@ -1749,6 +1749,9 @@
 						},
 						{
 							"name": "Update"
+						},
+						{
+							"name": "InsertDate"
 						}
 					],
 					"scriptLines": [
@@ -1773,7 +1776,7 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> SQL",
-						"split1@NewRecord alterRow(insertIf(true())) ~> Insert",
+						"InsertDate alterRow(insertIf(true())) ~> Insert",
 						"CSV select(mapColumn(",
 						"          ProductId,",
 						"          ProductName,",
@@ -1791,6 +1794,7 @@
 						"     disjoint: false) ~> split1@(NewRecord, Update)",
 						"split1@Update derive(UpdateDate = currentDate()) ~> UpdateDate",
 						"UpdateDate alterRow(updateIf(true())) ~> Update",
+						"split1@NewRecord derive(InsertDate = currentDate()) ~> InsertDate",
 						"Insert sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1814,8 +1818,8 @@
 						"          ProductId = split1@NewRecord@ProductId,",
 						"          ProductName = split1@NewRecord@ProductName,",
 						"          Price = split1@NewRecord@Price,",
-						"          HashKey,",
-						"          InsertedDate",
+						"          HashKey = SourceCSVHash,",
+						"          InsertedDate = InsertDate",
 						"     )) ~> sink1",
 						"Update sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -1842,7 +1846,7 @@
 						"          ProductName = split1@Update@ProductName,",
 						"          Price = split1@Update@Price,",
 						"          HashKey = SourceCSVHash,",
-						"          UpdatedDate",
+						"          UpdatedDate = UpdateDate",
 						"     )) ~> sink2"
 					]
 				}
