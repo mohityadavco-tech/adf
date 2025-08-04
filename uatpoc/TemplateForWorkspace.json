@@ -185,7 +185,8 @@
 											"datasetParameters": {
 												"CSV": {},
 												"SQL": {},
-												"sink1": {}
+												"sink1": {},
+												"sink2": {}
 											}
 										},
 										"staging": {},
@@ -1718,11 +1719,18 @@
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSqlServer",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
 						}
 					],
 					"transformations": [
 						{
-							"name": "alterRow2"
+							"name": "Insert"
 						},
 						{
 							"name": "SELECTCSV"
@@ -1731,10 +1739,16 @@
 							"name": "SourceHash"
 						},
 						{
-							"name": "lookup1"
+							"name": "lookup"
 						},
 						{
 							"name": "split1"
+						},
+						{
+							"name": "UpdateDate"
+						},
+						{
+							"name": "Update"
 						}
 					],
 					"scriptLines": [
@@ -1759,7 +1773,7 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> SQL",
-						"split1 alterRow(insertIf(true())) ~> alterRow2",
+						"split1@NewRecord alterRow(insertIf(true())) ~> Insert",
 						"CSV select(mapColumn(",
 						"          ProductId,",
 						"          ProductName,",
@@ -1767,14 +1781,17 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> SELECTCSV",
-						"SELECTCSV derive() ~> SourceHash",
-						"SourceHash lookup(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+						"SELECTCSV derive(SourceCSVHash = sha1(ProductId,ProductName,Price)) ~> SourceHash",
+						"SourceHash, SQL lookup(SELECTCSV@ProductId == SQL@ProductId,",
 						"     multiple: false,",
 						"     pickup: 'any',",
-						"     broadcast: 'auto')~> lookup1",
-						"lookup1 split(ERROR_FUNCTION(''),",
-						"     disjoint: false) ~> split1@(, )",
-						"alterRow2 sink(allowSchemaDrift: true,",
+						"     broadcast: 'auto')~> lookup",
+						"lookup split(isNull(SQL@ProductId),",
+						"     !isNull(SELECTCSV@ProductId) && notEquals(SourceCSVHash, HashKey),",
+						"     disjoint: false) ~> split1@(NewRecord, Update)",
+						"split1@Update derive(UpdateDate = currentDate()) ~> UpdateDate",
+						"UpdateDate alterRow(updateIf(true())) ~> Update",
+						"Insert sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          Id as long,",
@@ -1794,11 +1811,39 @@
 						"     skipDuplicateMapOutputs: true,",
 						"     errorHandlingOption: 'stopOnFirstError',",
 						"     mapColumn(",
-						"          ProductId,",
-						"          ProductName,",
-						"          Price,",
-						"          InsertedDate = InsertDate",
-						"     )) ~> sink1"
+						"          ProductId = split1@NewRecord@ProductId,",
+						"          ProductName = split1@NewRecord@ProductName,",
+						"          Price = split1@NewRecord@Price,",
+						"          HashKey,",
+						"          InsertedDate",
+						"     )) ~> sink1",
+						"Update sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Id as long,",
+						"          ProductId as string,",
+						"          ProductName as string,",
+						"          Price as double,",
+						"          HashKey as string,",
+						"          InsertedDate as timestamp,",
+						"          UpdatedDate as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['ProductId'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ProductId = split1@Update@ProductId,",
+						"          ProductName = split1@Update@ProductName,",
+						"          Price = split1@Update@Price,",
+						"          HashKey = SourceCSVHash,",
+						"          UpdatedDate",
+						"     )) ~> sink2"
 					]
 				}
 			},
